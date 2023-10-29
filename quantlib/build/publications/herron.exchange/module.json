@@ -1,0 +1,90 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.herron.exchange",
+    "module": "quantlib",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "quantlib-1.0.0.jar",
+          "url": "quantlib-1.0.0.jar",
+          "size": 8400,
+          "sha512": "bb6e40739d629f2ed21b417a8af06575b7fe7aef9224f275b6fda2bdce1a559399fcc0e02afa4389a28a7a7abdbc2c24837494b7ee8286356ec42253d5d5c03f",
+          "sha256": "1801e281152ce023280abc261af9e8d636cbd8f87116c2c31ba6e45cddea2d1d",
+          "sha1": "21e90b687af7dfbcbe9842369989deae804d1915",
+          "md5": "f0fa6a3e72bcdc3a9341921af7bdbc68"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.herron.exchange",
+          "module": "common-api",
+          "version": {
+            "requires": "1.0.249"
+          }
+        },
+        {
+          "group": "com.herron.exchange",
+          "module": "common",
+          "version": {
+            "requires": "1.0.249"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-math3",
+          "version": {
+            "requires": "3.2"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-web",
+          "version": {
+            "requires": "3.0.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "quantlib-1.0.0.jar",
+          "url": "quantlib-1.0.0.jar",
+          "size": 8400,
+          "sha512": "bb6e40739d629f2ed21b417a8af06575b7fe7aef9224f275b6fda2bdce1a559399fcc0e02afa4389a28a7a7abdbc2c24837494b7ee8286356ec42253d5d5c03f",
+          "sha256": "1801e281152ce023280abc261af9e8d636cbd8f87116c2c31ba6e45cddea2d1d",
+          "sha1": "21e90b687af7dfbcbe9842369989deae804d1915",
+          "md5": "f0fa6a3e72bcdc3a9341921af7bdbc68"
+        }
+      ]
+    }
+  ]
+}
