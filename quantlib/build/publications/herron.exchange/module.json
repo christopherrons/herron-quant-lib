@@ -3,7 +3,7 @@
   "component": {
     "group": "com.herron.exchange",
     "module": "quantlib",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -25,13 +25,13 @@
       },
       "files": [
         {
-          "name": "quantlib-1.0.0.jar",
-          "url": "quantlib-1.0.0.jar",
-          "size": 8400,
-          "sha512": "bb6e40739d629f2ed21b417a8af06575b7fe7aef9224f275b6fda2bdce1a559399fcc0e02afa4389a28a7a7abdbc2c24837494b7ee8286356ec42253d5d5c03f",
-          "sha256": "1801e281152ce023280abc261af9e8d636cbd8f87116c2c31ba6e45cddea2d1d",
-          "sha1": "21e90b687af7dfbcbe9842369989deae804d1915",
-          "md5": "f0fa6a3e72bcdc3a9341921af7bdbc68"
+          "name": "quantlib-1.0.2.jar",
+          "url": "quantlib-1.0.2.jar",
+          "size": 8382,
+          "sha512": "ef23e8a20042b187d8997b8e8c4c3aec78105f6db538ef64b04f8162152aa8f4d7c2114774b5914f7407999b9e7e10649535266dfd209caab0088caa1608d333",
+          "sha256": "96c6ed2a6fbfa8ab95fb8df1fc4b5601fa3177fea874c8c17aa2d588bfb96bbd",
+          "sha1": "a2fc3f065b35e3ce84e63f18f0eeedca6e59ea86",
+          "md5": "c0deae62ad0bbe0a6a515f83afe8be8a"
         }
       ]
     },
@@ -49,14 +49,14 @@
           "group": "com.herron.exchange",
           "module": "common-api",
           "version": {
-            "requires": "1.0.249"
+            "requires": "1.0.252"
           }
         },
         {
           "group": "com.herron.exchange",
           "module": "common",
           "version": {
-            "requires": "1.0.249"
+            "requires": "1.0.252"
           }
         },
         {
@@ -76,13 +76,13 @@
       ],
       "files": [
         {
-          "name": "quantlib-1.0.0.jar",
-          "url": "quantlib-1.0.0.jar",
-          "size": 8400,
-          "sha512": "bb6e40739d629f2ed21b417a8af06575b7fe7aef9224f275b6fda2bdce1a559399fcc0e02afa4389a28a7a7abdbc2c24837494b7ee8286356ec42253d5d5c03f",
-          "sha256": "1801e281152ce023280abc261af9e8d636cbd8f87116c2c31ba6e45cddea2d1d",
-          "sha1": "21e90b687af7dfbcbe9842369989deae804d1915",
-          "md5": "f0fa6a3e72bcdc3a9341921af7bdbc68"
+          "name": "quantlib-1.0.2.jar",
+          "url": "quantlib-1.0.2.jar",
+          "size": 8382,
+          "sha512": "ef23e8a20042b187d8997b8e8c4c3aec78105f6db538ef64b04f8162152aa8f4d7c2114774b5914f7407999b9e7e10649535266dfd209caab0088caa1608d333",
+          "sha256": "96c6ed2a6fbfa8ab95fb8df1fc4b5601fa3177fea874c8c17aa2d588bfb96bbd",
+          "sha1": "a2fc3f065b35e3ce84e63f18f0eeedca6e59ea86",
+          "md5": "c0deae62ad0bbe0a6a515f83afe8be8a"
         }
       ]
     }

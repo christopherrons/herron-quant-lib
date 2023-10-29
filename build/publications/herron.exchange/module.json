@@ -3,7 +3,7 @@
   "component": {
     "group": "com.herron.exchange",
     "module": "quantlib-api",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -25,13 +25,13 @@
       },
       "files": [
         {
-          "name": "quantlib-api-1.0.0.jar",
-          "url": "quantlib-api-1.0.0.jar",
+          "name": "quantlib-api-1.0.2.jar",
+          "url": "quantlib-api-1.0.2.jar",
           "size": 261,
-          "sha512": "10b153e427f3ef9f1bb02676714fc6799fb7f77be21ba5ed572568c39caa3338a18b47c6421db8fc1f20a2f7cbb99dafc56f6c2658bb915a5952ad44c6996e91",
-          "sha256": "d60b95a517ee270cdfc71b23fbee4835321d0bde4f32fb9be16f4b1593ba5be6",
-          "sha1": "d82df52f5f129be962bd69b1122878cea5f98529",
-          "md5": "bfe52ef813d993f78a2c8b8d5e25f704"
+          "sha512": "1167c996a1d6cb5305803624055ecbbd06fae0f710b697c487ce546141b72da31d1f0c868adbc14b0ae8d464df7a4ef52d56bf7428bcb35410af62fefb128114",
+          "sha256": "dece65437efd3f5b97bd1554e367e867c7d39adf9f5ccac5d0b81b398861ea4b",
+          "sha1": "12decd8a60bf481c56fd57a38c58f58dbd941ab8",
+          "md5": "5b98dddb71a000a93db74c86a33d802e"
         }
       ]
     },
@@ -49,21 +49,21 @@
           "group": "com.herron.exchange",
           "module": "quantlib",
           "version": {
-            "requires": "1.0.0"
+            "requires": "1.0.2"
           }
         },
         {
           "group": "com.herron.exchange",
           "module": "common-api",
           "version": {
-            "requires": "1.0.249"
+            "requires": "1.0.252"
           }
         },
         {
           "group": "com.herron.exchange",
           "module": "common",
           "version": {
-            "requires": "1.0.249"
+            "requires": "1.0.252"
           }
         },
         {
@@ -83,13 +83,13 @@
       ],
       "files": [
         {
-          "name": "quantlib-api-1.0.0.jar",
-          "url": "quantlib-api-1.0.0.jar",
+          "name": "quantlib-api-1.0.2.jar",
+          "url": "quantlib-api-1.0.2.jar",
           "size": 261,
-          "sha512": "10b153e427f3ef9f1bb02676714fc6799fb7f77be21ba5ed572568c39caa3338a18b47c6421db8fc1f20a2f7cbb99dafc56f6c2658bb915a5952ad44c6996e91",
-          "sha256": "d60b95a517ee270cdfc71b23fbee4835321d0bde4f32fb9be16f4b1593ba5be6",
-          "sha1": "d82df52f5f129be962bd69b1122878cea5f98529",
-          "md5": "bfe52ef813d993f78a2c8b8d5e25f704"
+          "sha512": "1167c996a1d6cb5305803624055ecbbd06fae0f710b697c487ce546141b72da31d1f0c868adbc14b0ae8d464df7a4ef52d56bf7428bcb35410af62fefb128114",
+          "sha256": "dece65437efd3f5b97bd1554e367e867c7d39adf9f5ccac5d0b81b398861ea4b",
+          "sha1": "12decd8a60bf481c56fd57a38c58f58dbd941ab8",
+          "md5": "5b98dddb71a000a93db74c86a33d802e"
         }
       ]
     }

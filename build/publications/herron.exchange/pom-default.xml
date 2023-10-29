@@ -8,24 +8,24 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.herron.exchange</groupId>
   <artifactId>quantlib-api</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
   <dependencies>
     <dependency>
       <groupId>com.herron.exchange</groupId>
       <artifactId>quantlib</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.herron.exchange</groupId>
       <artifactId>common-api</artifactId>
-      <version>1.0.249</version>
+      <version>1.0.252</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.herron.exchange</groupId>
       <artifactId>common</artifactId>
-      <version>1.0.249</version>
+      <version>1.0.252</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
