@@ -72,7 +72,7 @@ public class BondDiscountingPriceModel {
     }
 
     private static double calculateDiscountFactor(BondInstrument bondInstrument, Timestamp start, Timestamp end, DoubleUnaryOperator yieldAtMaturityExtractor) {
-        var timeToMaturity = YEARS.between(start.toLocalDate(), end.toLocalDate());
+        var timeToMaturity = YEARS.between(start.toLocalDate(), end.toLocalDate()); //FIME: Can ne less then 1
         double yieldAtTimeToMaturity = yieldAtMaturityExtractor.applyAsDouble(timeToMaturity);
         return bondInstrument.priceModelParameters().compoundingMethod().calculateValue(yieldAtTimeToMaturity, timeToMaturity, bondInstrument.couponAnnualFrequency());
     }

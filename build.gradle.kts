@@ -41,6 +41,7 @@ allprojects {
 				from(components["java"])
 			}
 			repositories {
+				mavenLocal()
 				maven {
 					name = "bytesafe"
 					url = uri("https://herron.bytesafe.dev/maven/herron/")
