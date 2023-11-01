@@ -23,15 +23,38 @@ class BlackScholesMertonTest {
 
     @Test
     void test_option_put_price() {
-        var option = createOption(PUT, 105, Timestamp.from(LocalDate.of(2023, 12, 31)));
-        var price = BlackScholesMerton.calculate(
-                Timestamp.now(),
+        var option = createOption(PUT, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
+        var result = BlackScholesMerton.calculate(
+                Timestamp.from(LocalDate.of(2023, 10, 31)),
                 option,
-                100,
+                1000,
                 0.01,
-                0.01
+                0.01,
+                0
         );
-        assertEquals(4.8224, price);
+        assertEquals(1.31650, result.price(), 0.001);
+        assertEquals(-0.43403, result.delta(), 0.001);
+        assertEquals(0.09629, result.gamma(), 0.001);
+        assertEquals(1.6079632, result.vega(), 0.001);
+        assertEquals(-0.7270324, result.rho(), 0.001);
+    }
+
+    @Test
+    void test_option_call_price() {
+        var option = createOption(CALL, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
+        var result = BlackScholesMerton.calculate(
+                Timestamp.from(LocalDate.of(2023, 10, 31)),
+                option,
+                1000,
+                0.01,
+                0.01,
+                0
+        );
+        assertEquals(1.98806, result.price(), 0.001);
+        assertEquals(0.56597, result.delta(), 0.001);
+        assertEquals(0.09629, result.gamma(), 0.001);
+        assertEquals(1.6079632, result.vega(), 0.001);
+        assertEquals(0.9418482, result.rho(), 0.001);
     }
 
 
