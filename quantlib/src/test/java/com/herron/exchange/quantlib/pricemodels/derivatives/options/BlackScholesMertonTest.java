@@ -23,9 +23,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BlackScholesMertonTest {
 
     @Test
+    void test_option_put_implied_volatility() {
+        var option = createOption(PUT, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
+        var iv = BlackScholesMerton.calculateImpliedVolatility(
+                Timestamp.from(LocalDate.of(2023, 10, 31)),
+                option,
+                4.555,
+                1000,
+                0.02,
+                0.01
+        );
+
+        assertEquals(PureNumber.create(0.03), iv.scale(2));
+    }
+
+    @Test
     void test_option_put_price() {
         var option = createOption(PUT, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
-        var result = BlackScholesMerton.calculate(
+        var result = BlackScholesMerton.calculateOptionPrice(
                 Timestamp.from(LocalDate.of(2023, 10, 31)),
                 option,
                 1000,
@@ -42,9 +57,24 @@ class BlackScholesMertonTest {
     }
 
     @Test
+    void test_option_call_implied_volatility() {
+        var option = createOption(CALL, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
+        var iv = BlackScholesMerton.calculateImpliedVolatility(
+                Timestamp.from(LocalDate.of(2023, 10, 31)),
+                option,
+                5.22539,
+                1000,
+                0.02,
+                0.01
+        );
+
+        assertEquals(PureNumber.create(0.03), iv.scale(2));
+    }
+
+    @Test
     void test_option_call_price() {
         var option = createOption(CALL, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
-        var result = BlackScholesMerton.calculate(
+        var result = BlackScholesMerton.calculateOptionPrice(
                 Timestamp.from(LocalDate.of(2023, 10, 31)),
                 option,
                 1000,
@@ -56,7 +86,7 @@ class BlackScholesMertonTest {
         assertEquals(PureNumber.create(0.52341), result.sensitivity().delta());
         assertEquals(PureNumber.create(0.03241), result.sensitivity().gamma());
         assertEquals(PureNumber.create(1.62516), result.sensitivity().vega());
-       // assertEquals(PureNumber.create(-0.06842).scale(5), result.sensitivity().theta());
+        // assertEquals(PureNumber.create(-0.06842).scale(5), result.sensitivity().theta());
         assertEquals(PureNumber.create(0.86600).scale(5), result.sensitivity().rho());
     }
 
