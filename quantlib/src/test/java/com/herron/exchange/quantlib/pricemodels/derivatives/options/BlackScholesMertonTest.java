@@ -45,7 +45,7 @@ class BlackScholesMertonTest {
                 option,
                 1000,
                 0.03,
-                0.02,
+                r -> 0.02,
                 0.01
         );
         assertEquals(Price.create(4.55500).scale(5), result.price());
@@ -79,7 +79,7 @@ class BlackScholesMertonTest {
                 option,
                 1000,
                 0.03,
-                0.02,
+                r -> 0.02,
                 0.01
         );
         assertEquals(Price.create(5.22539), result.price());

@@ -19,7 +19,6 @@ import java.util.function.DoubleUnaryOperator;
 import static com.herron.exchange.common.api.common.enums.EventType.SYSTEM;
 import static com.herron.exchange.common.api.common.enums.Status.OK;
 import static java.time.temporal.ChronoUnit.DAYS;
-import static java.time.temporal.ChronoUnit.YEARS;
 
 public class BondDiscountingPriceModel {
 

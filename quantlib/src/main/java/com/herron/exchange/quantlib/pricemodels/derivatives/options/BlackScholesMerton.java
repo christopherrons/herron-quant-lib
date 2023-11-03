@@ -11,6 +11,8 @@ import com.herron.exchange.common.api.common.messages.pricing.ImmutableBlackScho
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableOptionGreeks;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+import java.util.function.DoubleUnaryOperator;
+
 import static com.herron.exchange.common.api.common.enums.EventType.SYSTEM;
 import static com.herron.exchange.common.api.common.enums.Status.OK;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -26,10 +28,11 @@ public class BlackScholesMerton {
                                                                     OptionInstrument optionInstrument,
                                                                     double underlyingPrice,
                                                                     double volatility,
-                                                                    double riskFreeRate,
+                                                                    DoubleUnaryOperator riskFreeRateExtractor,
                                                                     double dividendYield) {
         double strikePrice = optionInstrument.strikePrice().getRealValue();
         double timeToMaturity = DAYS.between(valuationTime.toLocalDate(), optionInstrument.maturityDate().toLocalDate()) / DAYS_PER_YEAR;
+        double riskFreeRate = riskFreeRateExtractor.applyAsDouble(timeToMaturity);
         var commonCalculations = CommonCalculations.from(underlyingPrice, strikePrice, riskFreeRate, dividendYield, volatility, timeToMaturity);
 
         double optionPrice = calculateOptionPrice(optionInstrument.optionType(), underlyingPrice, strikePrice, commonCalculations);
