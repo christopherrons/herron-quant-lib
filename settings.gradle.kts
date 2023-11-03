@@ -7,8 +7,8 @@ dependencyResolutionManagement {
             library("spring.boot.starter.web", "org.springframework.boot:spring-boot-starter-web:3.0.1")
             library("spring.boot.starter.parent", "org.springframework.boot:spring-boot-starter-parent:3.0.1")
             library("commons.math", "org.apache.commons:commons-math3:3.2")
-            library("common.api", "com.herron.exchange:common-api:1.0.265")
-            library("common", "com.herron.exchange:common:1.0.265")
+            library("common.api", "com.herron.exchange:common-api:1.0.274")
+            library("common", "com.herron.exchange:common:1.0.274")
         }
 
         create("testlibs") {

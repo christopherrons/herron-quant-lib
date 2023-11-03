@@ -30,7 +30,7 @@ public class CouponCalculationUtils {
                     new CouponPeriod(
                             Timestamp.from(couponStartDate),
                             Timestamp.from(couponEndDate),
-                            instrument.couponRate() / instrument.couponAnnualFrequency()
+                            instrument.couponRate().divide(instrument.couponAnnualFrequency()).getRealValue()
                     )
             );
             couponEndDate = couponStartDate;

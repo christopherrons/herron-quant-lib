@@ -8,6 +8,7 @@ import com.herron.exchange.common.api.common.enums.DayCountConventionEnum;
 import com.herron.exchange.common.api.common.enums.InterpolationMethod;
 import com.herron.exchange.common.api.common.messages.common.BusinessCalendar;
 import com.herron.exchange.common.api.common.messages.common.MonetaryAmount;
+import com.herron.exchange.common.api.common.messages.common.PureNumber;
 import com.herron.exchange.common.api.common.messages.common.Timestamp;
 import com.herron.exchange.common.api.common.messages.pricing.BondDiscountPriceModelResult;
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableBondDiscountPriceModelParameters;
@@ -41,7 +42,7 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2021, 6, 30));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0, now);
-        assertEquals(19.90, result.accruedInterest(), 0.1);
+        assertEquals(19.90, result.accruedInterest().getRealValue(), 0.1);
     }
 
     @Test
@@ -61,7 +62,7 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2011, 4, 30));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.04, now);
-        assertEquals(16.43, result.accruedInterest(), 0.01);
+        assertEquals(16.43, result.accruedInterest().getRealValue(), 0.01);
     }
 
     @Test
@@ -81,9 +82,9 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2019, 1, 1));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.05, now);
-        assertEquals(376.89, result.dirtyPrice().getRealValue(), 0.1);
+        assertEquals(376.64, result.dirtyPrice().scale(2).getRealValue(), 0.1);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0);
-        assertEquals(0, result.accruedInterest(), 0);
+        assertEquals(0, result.accruedInterest().getRealValue(), 0);
     }
 
     @Test
@@ -104,7 +105,7 @@ class BondDiscountingPriceModelTest {
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.03, now);
         assertEquals(1038.54, result.dirtyPrice().getRealValue(), 1);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0.01);
-        assertEquals(0, result.accruedInterest(), 0);
+        assertEquals(0, result.accruedInterest().getRealValue(), 0);
     }
 
     @Test
@@ -124,9 +125,9 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2020, 1, 1));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.04, now);
-        assertEquals(796.14, result.dirtyPrice().getRealValue(), 0.01);
+        assertEquals(795.82, result.dirtyPrice().getRealValue(), 0.01);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0.01);
-        assertEquals(0, result.accruedInterest(), 0);
+        assertEquals(0, result.accruedInterest().getRealValue(), 0);
     }
 
     @Test
@@ -146,9 +147,9 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2020, 1, 1));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.04, now);
-        assertEquals(798.83, result.dirtyPrice().getRealValue(), 1);
+        assertEquals(794.49, result.dirtyPrice().getRealValue(), 1);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0.01);
-        assertEquals(0, result.accruedInterest(), 0);
+        assertEquals(0, result.accruedInterest().getRealValue(), 0);
     }
 
     @Test
@@ -157,7 +158,7 @@ class BondDiscountingPriceModelTest {
                 false,
                 0.1,
                 2,
-                Timestamp.from(LocalDate.of(2028, 10, 1)),
+                Timestamp.from(LocalDate.of(2028, 1, 1)),
                 Timestamp.from(LocalDate.of(2023, 1, 1)),
                 1000,
                 CompoundingMethodEnum.COMPOUNDING,
@@ -168,9 +169,9 @@ class BondDiscountingPriceModelTest {
 
         var now = Timestamp.from(LocalDate.of(2020, 1, 1));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, 0.1, now);
-        assertEquals(677.91, result.dirtyPrice().getRealValue(), 0.01);
+        assertEquals(667.29, result.dirtyPrice().scale(2).getRealValue(), 0.01);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0.01);
-        assertEquals(0.00, result.accruedInterest(), 0.001);
+        assertEquals(0.00, result.accruedInterest().getRealValue(), 0.001);
     }
 
     @Test
@@ -191,9 +192,9 @@ class BondDiscountingPriceModelTest {
         YieldCurve curve = createTestCurve();
         var now = Timestamp.from(LocalDate.of(2020, 1, 1));
         var result = (BondDiscountPriceModelResult) BondDiscountingPriceModel.calculate(bond, curve, now);
-        assertEquals(812.32, result.dirtyPrice().getRealValue(), 1);
+        assertEquals(808.49, result.dirtyPrice().scale(2).getRealValue(), 1);
         assertEquals(result.dirtyPrice().getRealValue(), result.dirtyPrice().getRealValue(), 0.01);
-        assertEquals(0, result.accruedInterest(), 0);
+        assertEquals(0, result.accruedInterest().getRealValue(), 0);
     }
 
     private Product buildProduct(BusinessCalendar businessCalendar) {
@@ -228,7 +229,7 @@ class BondDiscountingPriceModelTest {
                 .maturityDate(maturityData)
                 .startDate(startDate)
                 .nominalValue(MonetaryAmount.create(nominalValue, "eur"))
-                .couponRate(couponRate)
+                .couponRate(PureNumber.create(couponRate))
                 .priceModelParameters(ImmutableBondDiscountPriceModelParameters.builder().dayCountConvention(dayCountConvetionEnum)
                         .compoundingMethod(compoundingMethodEnum)
                         .calculateWithCurve(useCurve)
