@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholesMertonTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2023-11-03T11:47:08" hostname="christopher-XPS-15-9570" time="0.036">
-  <properties/>
-  <testcase name="test_option_call_price()" classname="com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholesMertonTest" time="0.033"/>
-  <testcase name="test_option_put_price()" classname="com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholesMertonTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
