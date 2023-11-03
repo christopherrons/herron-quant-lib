@@ -6,6 +6,7 @@ import com.herron.exchange.common.api.common.enums.OptionTypeEnum;
 import com.herron.exchange.common.api.common.enums.SettlementTypeEnum;
 import com.herron.exchange.common.api.common.messages.common.BusinessCalendar;
 import com.herron.exchange.common.api.common.messages.common.Price;
+import com.herron.exchange.common.api.common.messages.common.PureNumber;
 import com.herron.exchange.common.api.common.messages.common.Timestamp;
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableBlackScholesPriceModelParameters;
 import com.herron.exchange.common.api.common.messages.refdata.ImmutableDefaultOptionInstrument;
@@ -28,15 +29,16 @@ class BlackScholesMertonTest {
                 Timestamp.from(LocalDate.of(2023, 10, 31)),
                 option,
                 1000,
-                0.01,
-                0.01,
-                0
+                0.03,
+                0.02,
+                0.01
         );
-        assertEquals(1.31650, result.price(), 0.001);
-        assertEquals(-0.43403, result.delta(), 0.001);
-        assertEquals(0.09629, result.gamma(), 0.001);
-        assertEquals(1.6079632, result.vega(), 0.001);
-        assertEquals(-0.7270324, result.rho(), 0.001);
+        assertEquals(Price.create(4.55500).scale(5), result.price());
+        assertEquals(PureNumber.create(-0.47492), result.sensitivity().delta());
+        assertEquals(PureNumber.create(0.03241), result.sensitivity().gamma());
+        assertEquals(PureNumber.create(1.62516), result.sensitivity().vega());
+        //  assertEquals(PureNumber.create(-0.0138), result.sensitivity().theta());
+        assertEquals(PureNumber.create(-0.80132), result.sensitivity().rho());
     }
 
     @Test
@@ -46,15 +48,16 @@ class BlackScholesMertonTest {
                 Timestamp.from(LocalDate.of(2023, 10, 31)),
                 option,
                 1000,
-                0.01,
-                0.01,
-                0
+                0.03,
+                0.02,
+                0.01
         );
-        assertEquals(1.98806, result.price(), 0.001);
-        assertEquals(0.56597, result.delta(), 0.001);
-        assertEquals(0.09629, result.gamma(), 0.001);
-        assertEquals(1.6079632, result.vega(), 0.001);
-        assertEquals(0.9418482, result.rho(), 0.001);
+        assertEquals(Price.create(5.22539), result.price());
+        assertEquals(PureNumber.create(0.52341), result.sensitivity().delta());
+        assertEquals(PureNumber.create(0.03241), result.sensitivity().gamma());
+        assertEquals(PureNumber.create(1.62516), result.sensitivity().vega());
+       // assertEquals(PureNumber.create(-0.06842).scale(5), result.sensitivity().theta());
+        assertEquals(PureNumber.create(0.86600).scale(5), result.sensitivity().rho());
     }
 
 
