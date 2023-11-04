@@ -4,6 +4,7 @@ import com.herron.exchange.common.api.common.api.referencedata.instruments.Instr
 import com.herron.exchange.common.api.common.api.referencedata.instruments.OptionInstrument;
 import com.herron.exchange.common.api.common.messages.common.Price;
 import com.herron.exchange.common.api.common.messages.common.Timestamp;
+import com.herron.exchange.common.api.common.messages.pricing.Black76PriceModelParameters;
 import com.herron.exchange.common.api.common.messages.pricing.BlackScholesPriceModelParameters;
 import com.herron.exchange.common.api.common.parametricmodels.forwardcurve.ForwardPriceCurve;
 import com.herron.exchange.common.api.common.parametricmodels.impliedvolsurface.ImpliedVolatilitySurface;
@@ -56,7 +57,8 @@ public class ImpliedVolatilityConstructor {
                         dividendYield).getRealValue();
             }
             case BLACK_76 -> {
-                double forwardPrice = forwardPriceCurve != null ? forwardPriceCurve.getForwardPrice(timeToMaturity) : spotPrice * Math.exp(riskFreeRate * timeToMaturity);
+                double dividendYield = ((Black76PriceModelParameters) option.priceModelParameters()).dividendYield().getRealValue();
+                double forwardPrice = forwardPriceCurve != null ? forwardPriceCurve.getForwardPrice(timeToMaturity) : spotPrice * Math.exp((riskFreeRate - dividendYield) * timeToMaturity);
                 yield Black76.calculateImpliedVolatility(
                         option.optionType(),
                         strikePrice,
