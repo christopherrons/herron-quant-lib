@@ -1,8 +1,6 @@
 package com.herron.exchange.quantlib.pricemodels.fixedincome.bonds;
 
 import com.herron.exchange.common.api.common.api.referencedata.instruments.BondInstrument;
-import com.herron.exchange.common.api.common.curves.YieldCurve;
-import com.herron.exchange.common.api.common.curves.YieldCurveModelParameters;
 import com.herron.exchange.common.api.common.enums.CompoundingMethodEnum;
 import com.herron.exchange.common.api.common.enums.DayCountConventionEnum;
 import com.herron.exchange.common.api.common.enums.InterpolationMethod;
@@ -13,6 +11,8 @@ import com.herron.exchange.common.api.common.messages.common.Timestamp;
 import com.herron.exchange.common.api.common.messages.pricing.BondDiscountPriceModelResult;
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableBondDiscountPriceModelParameters;
 import com.herron.exchange.common.api.common.messages.refdata.*;
+import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.YieldCurve;
+import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.YieldCurveModelParameters;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

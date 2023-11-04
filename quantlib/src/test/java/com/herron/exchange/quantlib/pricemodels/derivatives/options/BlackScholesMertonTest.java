@@ -27,10 +27,11 @@ class BlackScholesMertonTest {
     void test_option_put_implied_volatility() {
         var option = createOption(PUT, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
         var iv = BlackScholesMerton.calculateImpliedVolatility(
-                Timestamp.from(LocalDate.of(2023, 10, 31)),
-                option,
+                option.optionType(),
+                option.strikePrice().getRealValue(),
                 4.555,
                 1000,
+                BlackScholesMerton.calculateTimeToMaturity(Timestamp.from(LocalDate.of(2023, 10, 31)), option),
                 0.02,
                 0.01
         );
@@ -64,10 +65,11 @@ class BlackScholesMertonTest {
     void test_option_call_implied_volatility() {
         var option = createOption(CALL, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
         var iv = BlackScholesMerton.calculateImpliedVolatility(
-                Timestamp.from(LocalDate.of(2023, 10, 31)),
-                option,
+                option.optionType(),
+                option.strikePrice().getRealValue(),
                 5.22539,
                 1000,
+                BlackScholesMerton.calculateTimeToMaturity(Timestamp.from(LocalDate.of(2023, 10, 31)), option),
                 0.02,
                 0.01
         );

@@ -58,19 +58,18 @@ public class BlackScholesMerton {
                 .build();
     }
 
-    public static PureNumber calculateImpliedVolatility(Timestamp valuationTime,
-                                                        OptionInstrument optionInstrument,
+    public static PureNumber calculateImpliedVolatility(OptionTypeEnum optionType,
+                                                        double strikePrice,
                                                         double marketPrice,
                                                         double underlyingPrice,
+                                                        double timeToMaturity,
                                                         double riskFreeRate,
                                                         double dividendYield) {
-        double strikePrice = optionInstrument.strikePrice().getRealValue();
-        double timeToMaturity = calculateTimeToMaturity(valuationTime, optionInstrument);
         double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
 
         for (int i = 0; i < IMPLIED_VOLATILITY_MAX_ITERATIONS; i++) {
             var commonCalculations = CommonCalculations.from(underlyingPrice, strikePrice, riskFreeRate, dividendYield, impliedVolatility, timeToMaturity);
-            double theoreticalPrice = calculateOptionPrice(optionInstrument.optionType(), underlyingPrice, strikePrice, commonCalculations);
+            double theoreticalPrice = calculateOptionPrice(optionType, underlyingPrice, strikePrice, commonCalculations);
             double difference = theoreticalPrice - marketPrice;
             if (Math.abs(difference) <= IMPLIED_VOLATILITY_THRESHOLD) {
                 break;
