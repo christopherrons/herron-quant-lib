@@ -12,7 +12,7 @@ import com.herron.exchange.common.api.common.messages.pricing.BondDiscountPriceM
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableBondDiscountPriceModelParameters;
 import com.herron.exchange.common.api.common.messages.refdata.*;
 import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.YieldCurve;
-import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.YieldCurveModelParameters;
+import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.model.YieldCurveModelParameters;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

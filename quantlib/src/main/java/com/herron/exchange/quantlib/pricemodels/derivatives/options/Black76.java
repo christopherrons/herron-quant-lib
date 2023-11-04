@@ -15,7 +15,7 @@ import static com.herron.exchange.common.api.common.enums.EventType.SYSTEM;
 import static com.herron.exchange.common.api.common.enums.Status.OK;
 import static java.time.temporal.ChronoUnit.DAYS;
 
-public class BlackScholesMerton {
+public class Black76 {
     private static final double DAYS_PER_YEAR = DayCountConventionEnum.ACT365.getDaysPerYear();
     private static final double IMPLIED_VOLATILITY_START_GUESS = 0.01;
     private static final int IMPLIED_VOLATILITY_MAX_ITERATIONS = 100000;
@@ -23,24 +23,27 @@ public class BlackScholesMerton {
     private static final NormalDistribution STANDARD_NORMAL_DISTRIBUTION = new NormalDistribution();
 
     public static double calculateTimeToMaturity(Timestamp valuationTime, OptionInstrument optionInstrument) {
-        return DAYS.between(valuationTime.toLocalDate(), optionInstrument.maturityDate().toLocalDate()) / DAYS_PER_YEAR;
+        return calculateTimeToMaturity(valuationTime, optionInstrument.maturityDate());
+    }
+
+    public static double calculateTimeToMaturity(Timestamp valuationTime, Timestamp maturityDate) {
+        return DAYS.between(valuationTime.toLocalDate(), maturityDate.toLocalDate()) / DAYS_PER_YEAR;
     }
 
     public static BlackScholesPriceModelResult calculateOptionPrice(Timestamp valuationTime,
                                                                     OptionTypeEnum optionType,
                                                                     double strikePrice,
-                                                                    double spotPrice,
+                                                                    double forwardPrice,
                                                                     double volatility,
                                                                     double timeToMaturity,
-                                                                    double riskFreeRate,
-                                                                    double dividendYield) {
-        var commonCalculations = CommonCalculations.from(spotPrice, strikePrice, riskFreeRate, dividendYield, volatility, timeToMaturity);
+                                                                    double riskFreeRate) {
+        var commonCalculations = CommonCalculations.from(forwardPrice, strikePrice, riskFreeRate, volatility, timeToMaturity);
 
-        double optionPrice = calculateOptionPrice(optionType, spotPrice, strikePrice, commonCalculations);
+        double optionPrice = calculateOptionPrice(optionType, forwardPrice, strikePrice, commonCalculations);
         double delta = calculateDelta(optionType, commonCalculations);
-        double theta = calculateTheta(optionType, spotPrice, volatility, strikePrice, timeToMaturity, riskFreeRate, dividendYield, commonCalculations);
-        double vega = calculateVega(spotPrice, timeToMaturity, commonCalculations);
-        double gamma = calculateGamma(spotPrice, volatility, timeToMaturity, commonCalculations);
+        double theta = calculateTheta(optionType, forwardPrice, volatility, strikePrice, timeToMaturity, riskFreeRate, commonCalculations);
+        double vega = calculateVega(forwardPrice, timeToMaturity, commonCalculations);
+        double gamma = calculateGamma(forwardPrice, volatility, timeToMaturity, commonCalculations);
         double rho = calculateRho(optionType, strikePrice, timeToMaturity, commonCalculations);
         return ImmutableBlackScholesPriceModelResult.builder()
                 .price(Price.create(optionPrice).scale(5))
@@ -61,20 +64,19 @@ public class BlackScholesMerton {
     public static PureNumber calculateImpliedVolatility(OptionTypeEnum optionType,
                                                         double strikePrice,
                                                         double marketPrice,
-                                                        double spotPrice,
+                                                        double forwardPrice,
                                                         double timeToMaturity,
-                                                        double riskFreeRate,
-                                                        double dividendYield) {
+                                                        double riskFreeRate) {
         double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
 
         for (int i = 0; i < IMPLIED_VOLATILITY_MAX_ITERATIONS; i++) {
-            var commonCalculations = CommonCalculations.from(spotPrice, strikePrice, riskFreeRate, dividendYield, impliedVolatility, timeToMaturity);
-            double theoreticalPrice = calculateOptionPrice(optionType, spotPrice, strikePrice, commonCalculations);
+            var commonCalculations = CommonCalculations.from(forwardPrice, strikePrice, riskFreeRate, impliedVolatility, timeToMaturity);
+            double theoreticalPrice = calculateOptionPrice(optionType, forwardPrice, strikePrice, commonCalculations);
             double difference = theoreticalPrice - marketPrice;
             if (Math.abs(difference) <= IMPLIED_VOLATILITY_THRESHOLD) {
                 break;
             }
-            double vega = calculateVega(spotPrice, timeToMaturity, commonCalculations);
+            double vega = calculateVega(forwardPrice, timeToMaturity, commonCalculations);
             impliedVolatility = Math.max(0, impliedVolatility - (difference / (vega * 100)));
         }
 
@@ -82,50 +84,50 @@ public class BlackScholesMerton {
     }
 
     private static double calculateOptionPrice(OptionTypeEnum optionTypeEnum,
-                                               double spotPrice,
+                                               double forwardPrice,
                                                double strikePrice,
                                                CommonCalculations commonCalculations) {
         return switch (optionTypeEnum) {
-            case CALL -> calculateCallOptionPrice(spotPrice, strikePrice, commonCalculations);
-            case PUT -> calculatePutOptionPrice(spotPrice, strikePrice, commonCalculations);
+            case CALL -> calculateCallOptionPrice(forwardPrice, strikePrice, commonCalculations);
+            case PUT -> calculatePutOptionPrice(forwardPrice, strikePrice, commonCalculations);
         };
     }
 
-    private static double calculatePutOptionPrice(double spotPrice,
+    private static double calculatePutOptionPrice(double forwardPrice,
                                                   double strikePrice,
                                                   CommonCalculations commonCalculations) {
         return strikePrice * commonCalculations.compoundedRiskFreeRate * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d2) -
-                spotPrice * commonCalculations.compoundedYield * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d1);
+                forwardPrice * commonCalculations.compoundedRiskFreeRate * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d1);
     }
 
-    private static double calculateCallOptionPrice(double spotPrice,
+    private static double calculateCallOptionPrice(double forwardPrice,
                                                    double strikePrice,
                                                    CommonCalculations commonCalculations) {
-        return spotPrice * commonCalculations.compoundedYield * commonCalculations.cdfNormD1 -
+        return forwardPrice * commonCalculations.compoundedRiskFreeRate * commonCalculations.cdfNormD1 -
                 strikePrice * commonCalculations.compoundedRiskFreeRate * commonCalculations.cdfNormD2;
     }
 
     private static double calculateDelta(OptionTypeEnum optionTypeEnum,
                                          CommonCalculations commonCalculation) {
         return switch (optionTypeEnum) {
-            case CALL -> commonCalculation.compoundedYield * commonCalculation.cdfNormD1;
-            case PUT -> commonCalculation.compoundedYield * (commonCalculation.cdfNormD1 - 1);
+            case CALL -> commonCalculation.compoundedRiskFreeRate * commonCalculation.cdfNormD1;
+            case PUT -> commonCalculation.compoundedRiskFreeRate * (commonCalculation.cdfNormD1 - 1);
         };
     }
 
-    private static double calculateGamma(double spotPrice,
+    private static double calculateGamma(double forwardPrice,
                                          double volatility,
                                          double timeToMaturity,
                                          CommonCalculations commonCalculations) {
-        var rise = commonCalculations.compoundedYield * commonCalculations.pdfNormD1;
-        var run = spotPrice * volatility * Math.sqrt(timeToMaturity);
+        var rise = commonCalculations.compoundedRiskFreeRate * commonCalculations.pdfNormD1;
+        var run = forwardPrice * volatility * Math.sqrt(timeToMaturity);
         return rise / run;
     }
 
-    private static double calculateVega(double spotPrice,
+    private static double calculateVega(double forwardPrice,
                                         double timeToMaturity,
                                         CommonCalculations commonCalculations) {
-        var rise = commonCalculations.compoundedYield * spotPrice * Math.sqrt(timeToMaturity) * commonCalculations.pdfNormD1;
+        var rise = commonCalculations.compoundedRiskFreeRate * forwardPrice * Math.sqrt(timeToMaturity) * commonCalculations.pdfNormD1;
         return rise / 100;
     }
 
@@ -141,20 +143,19 @@ public class BlackScholesMerton {
     }
 
     private static double calculateTheta(OptionTypeEnum optionTypeEnum,
-                                         double spotPrice,
+                                         double forwardPrice,
                                          double volatility,
                                          double strikePrice,
                                          double timeToMaturity,
                                          double riskFreeRate,
-                                         double dividendYield,
                                          CommonCalculations commonCalculations) {
-        var sharedPart = -spotPrice * volatility * Math.exp(-dividendYield * timeToMaturity) * commonCalculations.pdfNormD1 / (2 * Math.sqrt(timeToMaturity));
+        var sharedPart = -forwardPrice * volatility * commonCalculations.compoundedRiskFreeRate * commonCalculations.pdfNormD1 / (2 * Math.sqrt(timeToMaturity));
         var sidePart = switch (optionTypeEnum) {
             case CALL -> -riskFreeRate * strikePrice * commonCalculations.compoundedRiskFreeRate * commonCalculations.pdfNormD2 +
-                    dividendYield * spotPrice * commonCalculations.compoundedYield * commonCalculations.cdfNormD1;
+                    riskFreeRate * forwardPrice * commonCalculations.compoundedRiskFreeRate * commonCalculations.cdfNormD1;
             case PUT ->
                     riskFreeRate * strikePrice * commonCalculations.compoundedRiskFreeRate * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d2) -
-                            dividendYield * spotPrice * commonCalculations.compoundedYield * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d1);
+                            riskFreeRate * forwardPrice * commonCalculations.compoundedRiskFreeRate * STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(-commonCalculations.d1);
         };
 
         return (1 / DAYS_PER_YEAR) * (sharedPart + sidePart);
@@ -166,18 +167,15 @@ public class BlackScholesMerton {
                                       double cdfNormD2,
                                       double pdfNormD1,
                                       double pdfNormD2,
-                                      double compoundedYield,
                                       double compoundedRiskFreeRate) {
 
-        public static CommonCalculations from(double spotPrice,
+        public static CommonCalculations from(double forwardPrice,
                                               double strikePrice,
                                               double riskFreeRate,
-                                              double dividendYield,
                                               double volatility,
                                               double timeToMaturity) {
-            var d1 = d1(spotPrice, strikePrice, volatility, dividendYield, riskFreeRate, timeToMaturity);
+            var d1 = d1(forwardPrice, strikePrice, volatility, timeToMaturity);
             var d2 = d2(d1, volatility, timeToMaturity);
-            var compoundedYield = Math.exp(-dividendYield * timeToMaturity);
             var compoundedRiskFreeRate = Math.exp(-riskFreeRate * timeToMaturity);
             return new CommonCalculations(
                     d1,
@@ -186,19 +184,16 @@ public class BlackScholesMerton {
                     STANDARD_NORMAL_DISTRIBUTION.cumulativeProbability(d2),
                     STANDARD_NORMAL_DISTRIBUTION.density(d1),
                     STANDARD_NORMAL_DISTRIBUTION.density(d2),
-                    compoundedYield,
                     compoundedRiskFreeRate
             );
         }
 
-        private static double d1(double spotPrice,
+        private static double d1(double forwardPrice,
                                  double strikePrice,
                                  double volatility,
-                                 double dividendYield,
-                                 double riskFreeRate,
                                  double timeToMaturity) {
 
-            var rise = Math.log(spotPrice / strikePrice) + (riskFreeRate - dividendYield + (volatility * volatility * 0.5)) * timeToMaturity;
+            var rise = Math.log(forwardPrice / strikePrice) + ((volatility * volatility * 0.5) * timeToMaturity);
             var run = volatility * Math.sqrt(timeToMaturity);
             return rise / run;
         }
