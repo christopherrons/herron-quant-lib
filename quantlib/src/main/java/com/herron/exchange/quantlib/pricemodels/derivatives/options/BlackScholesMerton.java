@@ -11,8 +11,6 @@ import com.herron.exchange.common.api.common.messages.pricing.ImmutableBlackScho
 import com.herron.exchange.common.api.common.messages.pricing.ImmutableOptionGreeks;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
-import java.util.function.DoubleUnaryOperator;
-
 import static com.herron.exchange.common.api.common.enums.EventType.SYSTEM;
 import static com.herron.exchange.common.api.common.enums.Status.OK;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -24,23 +22,26 @@ public class BlackScholesMerton {
     private static final double IMPLIED_VOLATILITY_THRESHOLD = 0.0001;
     private static final NormalDistribution STANDARD_NORMAL_DISTRIBUTION = new NormalDistribution();
 
+    public static double calculateTimeToMaturity(Timestamp valuationTime, OptionInstrument optionInstrument) {
+        return DAYS.between(valuationTime.toLocalDate(), optionInstrument.maturityDate().toLocalDate()) / DAYS_PER_YEAR;
+    }
+
     public static BlackScholesPriceModelResult calculateOptionPrice(Timestamp valuationTime,
-                                                                    OptionInstrument optionInstrument,
+                                                                    OptionTypeEnum optionType,
+                                                                    double strikePrice,
                                                                     double underlyingPrice,
                                                                     double volatility,
-                                                                    DoubleUnaryOperator riskFreeRateExtractor,
+                                                                    double timeToMaturity,
+                                                                    double riskFreeRate,
                                                                     double dividendYield) {
-        double strikePrice = optionInstrument.strikePrice().getRealValue();
-        double timeToMaturity = DAYS.between(valuationTime.toLocalDate(), optionInstrument.maturityDate().toLocalDate()) / DAYS_PER_YEAR;
-        double riskFreeRate = riskFreeRateExtractor.applyAsDouble(timeToMaturity);
         var commonCalculations = CommonCalculations.from(underlyingPrice, strikePrice, riskFreeRate, dividendYield, volatility, timeToMaturity);
 
-        double optionPrice = calculateOptionPrice(optionInstrument.optionType(), underlyingPrice, strikePrice, commonCalculations);
-        double delta = calculateDelta(optionInstrument.optionType(), commonCalculations);
-        double theta = calculateTheta(optionInstrument.optionType(), underlyingPrice, volatility, strikePrice, timeToMaturity, riskFreeRate, dividendYield, commonCalculations);
+        double optionPrice = calculateOptionPrice(optionType, underlyingPrice, strikePrice, commonCalculations);
+        double delta = calculateDelta(optionType, commonCalculations);
+        double theta = calculateTheta(optionType, underlyingPrice, volatility, strikePrice, timeToMaturity, riskFreeRate, dividendYield, commonCalculations);
         double vega = calculateVega(underlyingPrice, timeToMaturity, commonCalculations);
         double gamma = calculateGamma(underlyingPrice, volatility, timeToMaturity, commonCalculations);
-        double rho = calculateRho(optionInstrument.optionType(), strikePrice, timeToMaturity, commonCalculations);
+        double rho = calculateRho(optionType, strikePrice, timeToMaturity, commonCalculations);
         return ImmutableBlackScholesPriceModelResult.builder()
                 .price(Price.create(optionPrice).scale(5))
                 .sensitivity(ImmutableOptionGreeks.builder()
@@ -64,7 +65,7 @@ public class BlackScholesMerton {
                                                         double riskFreeRate,
                                                         double dividendYield) {
         double strikePrice = optionInstrument.strikePrice().getRealValue();
-        double timeToMaturity = DAYS.between(valuationTime.toLocalDate(), optionInstrument.maturityDate().toLocalDate()) / DAYS_PER_YEAR;
+        double timeToMaturity = calculateTimeToMaturity(valuationTime, optionInstrument);
         double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
 
         for (int i = 0; i < IMPLIED_VOLATILITY_MAX_ITERATIONS; i++) {

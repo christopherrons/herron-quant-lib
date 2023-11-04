@@ -2,6 +2,7 @@ package com.herron.exchange.quantlib.pricemodels.derivatives.options;
 
 import com.herron.exchange.common.api.common.api.referencedata.instruments.OptionInstrument;
 import com.herron.exchange.common.api.common.enums.OptionExerciseTyleEnum;
+import com.herron.exchange.common.api.common.enums.OptionSubTypeEnum;
 import com.herron.exchange.common.api.common.enums.OptionTypeEnum;
 import com.herron.exchange.common.api.common.enums.SettlementTypeEnum;
 import com.herron.exchange.common.api.common.messages.common.BusinessCalendar;
@@ -39,13 +40,16 @@ class BlackScholesMertonTest {
 
     @Test
     void test_option_put_price() {
+        var vt = Timestamp.from(LocalDate.of(2023, 10, 31));
         var option = createOption(PUT, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
         var result = BlackScholesMerton.calculateOptionPrice(
-                Timestamp.from(LocalDate.of(2023, 10, 31)),
-                option,
+                vt,
+                option.optionType(),
+                option.strikePrice().getRealValue(),
                 1000,
                 0.03,
-                r -> 0.02,
+                BlackScholesMerton.calculateTimeToMaturity(vt, option),
+                0.02,
                 0.01
         );
         assertEquals(Price.create(4.55500).scale(5), result.price());
@@ -73,13 +77,16 @@ class BlackScholesMertonTest {
 
     @Test
     void test_option_call_price() {
+        var vt = Timestamp.from(LocalDate.of(2023, 10, 31));
         var option = createOption(CALL, 1001, Timestamp.from(LocalDate.of(2023, 12, 31)));
         var result = BlackScholesMerton.calculateOptionPrice(
-                Timestamp.from(LocalDate.of(2023, 10, 31)),
-                option,
+                vt,
+                option.optionType(),
+                option.strikePrice().getRealValue(),
                 1000,
                 0.03,
-                r -> 0.02,
+                BlackScholesMerton.calculateTimeToMaturity(vt, option),
+                0.02,
                 0.01
         );
         assertEquals(Price.create(5.22539), result.price());
@@ -101,10 +108,11 @@ class BlackScholesMertonTest {
                 .firstTradingDate(Timestamp.from(LocalDate.MIN))
                 .lastTradingDate(Timestamp.from(LocalDate.MAX))
                 .maturityDate(maturityDate)
-                .strikePrice(Price.create(strikePrice))
+                .strikePrice(PureNumber.create(strikePrice))
                 .optionType(optionTypeEnum)
+                .optionSubType(OptionSubTypeEnum.OOE)
                 .optionExerciseStyle(OptionExerciseTyleEnum.EUROPEAN)
-                .priceModelParameters(ImmutableBlackScholesPriceModelParameters.builder().build())
+                .priceModelParameters(ImmutableBlackScholesPriceModelParameters.builder().yieldCurveId("").build())
                 .product(ImmutableProduct.builder().currency("eur").productId("product").market(ImmutableMarket.builder().marketId("market").businessCalendar(BusinessCalendar.defaultWeekendCalendar()).build()).build())
                 .build();
     }
