@@ -39,7 +39,7 @@ public class ForwardPriceCurveConstructor {
             points.add(new ForwardPricePoint(timeToMaturity, averageForwardPriceAtMaturity));
         }
 
-        return ForwardPriceCurve.create(underlyingInstrument.instrumentId(), new ForwardCurveModelParameters(points, CUBIC_SPLINE));
+            return ForwardPriceCurve.create(underlyingInstrument.instrumentId(), new ForwardCurveModelParameters(points, CUBIC_SPLINE));
     }
 
     private static double calculateForwardPriceAtTimeToMaturity(double timeToMaturity,
