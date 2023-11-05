@@ -102,7 +102,7 @@ public class Black76 {
         double lowerBound = IMPLIED_VOLATILITY_VALUE_MIN;
         double upperBound = IMPLIED_VOLATILITY_VALUE_MAX;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             double impliedVolatility = (upperBound - lowerBound) / 2.0;
             var commonCalculations = CommonCalculations.from(forwardPrice, strikePrice, riskFreeRate, impliedVolatility, timeToMaturity);
             double theoreticalPrice = calculateOptionPrice(optionType, forwardPrice, strikePrice, commonCalculations);
