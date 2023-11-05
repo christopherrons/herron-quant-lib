@@ -16,6 +16,8 @@ import com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholes
 import java.util.List;
 import java.util.Map;
 
+import static com.herron.exchange.common.api.common.enums.OptionTypeEnum.CALL;
+
 public class ImpliedVolatilityConstructor {
 
     public static ImpliedVolatilitySurface construct(Timestamp valuationTime,
@@ -41,7 +43,7 @@ public class ImpliedVolatilityConstructor {
                                                               YieldCurve yieldCurve,
                                                               ForwardPriceCurve forwardPriceCurve) {
         double strikePrice = option.strikePrice().getRealValue();
-        double logMoneyness = Math.log(strikePrice / spotPrice);
+        double logMoneyness = option.optionType() == CALL ? Math.log(spotPrice / strikePrice) : Math.log(strikePrice / spotPrice);
         double timeToMaturity = BlackScholesMerton.calculateTimeToMaturity(valuationTime, option);
         double riskFreeRate = yieldCurve.getYield(timeToMaturity);
         double impliedVolatility = switch (option.priceModel()) {
