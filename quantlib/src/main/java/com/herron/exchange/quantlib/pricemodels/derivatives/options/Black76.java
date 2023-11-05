@@ -114,7 +114,7 @@ public class Black76 {
             }
         }
 
-        return impliedVolatility;
+        return (lowerBound + upperBound) / 2.0;
     }
 
     private static double calculateOptionPrice(OptionTypeEnum optionTypeEnum,
