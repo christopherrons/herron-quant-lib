@@ -17,8 +17,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class BlackScholesMerton {
     private static final double DAYS_PER_YEAR = DayCountConventionEnum.ACT365.getDaysPerYear();
-    private static final double IMPLIED_VOLATILITY_START_GUESS = 0.01;
-    private static final int IMPLIED_VOLATILITY_MAX_ITERATIONS = 100000;
+    private static final double IMPLIED_VOLATILITY_START_GUESS = 0.3;
+    private static final int IMPLIED_VOLATILITY_MAX_ITERATIONS = 1000;
     private static final double IMPLIED_VOLATILITY_THRESHOLD = 0.0001;
     private static final NormalDistribution STANDARD_NORMAL_DISTRIBUTION = new NormalDistribution();
 
@@ -65,20 +65,56 @@ public class BlackScholesMerton {
                                                         double timeToMaturity,
                                                         double riskFreeRate,
                                                         double dividendYield) {
-        double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
+        double impliedVolatility = calculateInitialGuess(optionType,
+                strikePrice,
+                marketPrice,
+                spotPrice,
+                timeToMaturity,
+                riskFreeRate,
+                dividendYield
+        );
 
         for (int i = 0; i < IMPLIED_VOLATILITY_MAX_ITERATIONS; i++) {
             var commonCalculations = CommonCalculations.from(spotPrice, strikePrice, riskFreeRate, dividendYield, impliedVolatility, timeToMaturity);
             double theoreticalPrice = calculateOptionPrice(optionType, spotPrice, strikePrice, commonCalculations);
-            double difference = theoreticalPrice - marketPrice;
-            if (Math.abs(difference) <= IMPLIED_VOLATILITY_THRESHOLD) {
+            double vega = calculateVega(spotPrice, timeToMaturity, commonCalculations);
+            double priceDifference = theoreticalPrice - marketPrice;
+            double updatedImpliedVolatility = impliedVolatility - (priceDifference / (vega * 100));
+            updatedImpliedVolatility = Math.max(0, Math.min(updatedImpliedVolatility, 2));
+            double ivDifference = updatedImpliedVolatility - impliedVolatility;
+            impliedVolatility = updatedImpliedVolatility;
+            if (Math.abs(priceDifference) <= IMPLIED_VOLATILITY_THRESHOLD || Math.abs(ivDifference) <= IMPLIED_VOLATILITY_THRESHOLD) {
                 break;
             }
-            double vega = calculateVega(spotPrice, timeToMaturity, commonCalculations);
-            impliedVolatility = Math.max(0, impliedVolatility - (difference / (vega * 100)));
         }
 
         return PureNumber.create(impliedVolatility);
+    }
+
+    private static double calculateInitialGuess(OptionTypeEnum optionType,
+                                                double strikePrice,
+                                                double marketPrice,
+                                                double spotPrice,
+                                                double timeToMaturity,
+                                                double riskFreeRate,
+                                                double dividendYield) {
+        double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
+        double lowerBound = -Double.MIN_VALUE;
+        double upperBound = Double.MAX_VALUE;
+
+        while (lowerBound == -Double.MAX_VALUE || upperBound == Double.MAX_VALUE) {
+            var commonCalculations = CommonCalculations.from(spotPrice, strikePrice, riskFreeRate, dividendYield, impliedVolatility, timeToMaturity);
+            double theoreticalPrice = calculateOptionPrice(optionType, spotPrice, strikePrice, commonCalculations);
+            if (theoreticalPrice < marketPrice) {
+                lowerBound = impliedVolatility;
+                impliedVolatility = Math.min(upperBound, lowerBound + 0.1);
+            } else if (theoreticalPrice > marketPrice) {
+                upperBound = impliedVolatility;
+                impliedVolatility = Math.max(lowerBound, Math.max(0, upperBound - 0.1));
+            }
+        }
+
+        return impliedVolatility;
     }
 
     private static double calculateOptionPrice(OptionTypeEnum optionTypeEnum,
