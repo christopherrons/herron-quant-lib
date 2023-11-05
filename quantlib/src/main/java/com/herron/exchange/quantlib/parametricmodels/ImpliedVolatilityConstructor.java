@@ -33,7 +33,7 @@ public class ImpliedVolatilityConstructor {
                     return calculateImpliedVolatility(valuationTime, option, spotPrice, optionPrice, yieldCurve, forwardPriceCurve);
                 })
                 .toList();
-        return ImpliedVolatilitySurface.create("tmp", 0);
+        return ImpliedVolatilitySurface.create(underlying.instrumentId(), spotPrice);
     }
 
     private static ImpliedVolPoint calculateImpliedVolatility(Timestamp valuationTime,

@@ -17,7 +17,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class BlackScholesMerton {
     private static final double DAYS_PER_YEAR = DayCountConventionEnum.ACT365.getDaysPerYear();
-    private static final double IMPLIED_VOLATILITY_START_GUESS = 0.3;
+    private static final double IMPLIED_VOLATILITY_VALUE_MIN = 0.0;
+    private static final double IMPLIED_VOLATILITY_VALUE_MAX = 5.0;
     private static final int IMPLIED_VOLATILITY_MAX_ITERATIONS = 1000;
     private static final double IMPLIED_VOLATILITY_THRESHOLD = 0.0001;
     private static final NormalDistribution STANDARD_NORMAL_DISTRIBUTION = new NormalDistribution();
@@ -98,22 +99,23 @@ public class BlackScholesMerton {
                                                 double timeToMaturity,
                                                 double riskFreeRate,
                                                 double dividendYield) {
-        double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
-        double lowerBound = -Double.MAX_VALUE;
-        double upperBound = Double.MAX_VALUE;
+        double lowerBound = IMPLIED_VOLATILITY_VALUE_MIN;
+        double upperBound = IMPLIED_VOLATILITY_VALUE_MAX;
 
-        while (lowerBound == -Double.MAX_VALUE || upperBound == Double.MAX_VALUE) {
+        for (int i = 0; i < 5; i++) {
+            double impliedVolatility = (upperBound - lowerBound) / 2.0;
             var commonCalculations = CommonCalculations.from(spotPrice, strikePrice, riskFreeRate, dividendYield, impliedVolatility, timeToMaturity);
             double theoreticalPrice = calculateOptionPrice(optionType, spotPrice, strikePrice, commonCalculations);
-            if (theoreticalPrice < marketPrice) {
-                lowerBound = impliedVolatility;
-                impliedVolatility = Math.min(upperBound, lowerBound + 0.1);
-            } else if (theoreticalPrice > marketPrice) {
-                upperBound = impliedVolatility;
-                impliedVolatility = Math.max(lowerBound, Math.max(0, upperBound - 0.1));
-            }
-        }
 
+            if (theoreticalPrice > marketPrice) {
+                upperBound = impliedVolatility;
+            } else if (theoreticalPrice < marketPrice) {
+                lowerBound = impliedVolatility;
+            } else {
+                return impliedVolatility;
+            }
+
+        }
         return (lowerBound + upperBound) / 2.0;
     }
 

@@ -24,6 +24,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class BlackScholesMertonTest {
 
     @Test
+    void test_option_put_implied_volatility_3() {
+        var option = createOption(CALL, 47, Timestamp.from(LocalDate.of(2023, 12, 15)));
+        var iv = BlackScholesMerton.calculateImpliedVolatility(
+                option.optionType(),
+                option.strikePrice().getRealValue(),
+                0.0,
+                39.14,
+                BlackScholesMerton.calculateTimeToMaturity(Timestamp.from(LocalDate.of(2023, 11, 5)), option),
+                0.0544,
+                0.00
+        );
+
+        assertEquals(PureNumber.create(0.077), iv.scale(3));
+    }
+
+    @Test
     void test_option_put_implied_volatility_2() {
         var option = createOption(PUT, 12, Timestamp.from(LocalDate.of(2026, 6, 19)));
         var iv = BlackScholesMerton.calculateImpliedVolatility(
