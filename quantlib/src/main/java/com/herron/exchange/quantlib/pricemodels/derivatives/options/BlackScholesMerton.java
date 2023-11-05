@@ -99,7 +99,7 @@ public class BlackScholesMerton {
                                                 double riskFreeRate,
                                                 double dividendYield) {
         double impliedVolatility = IMPLIED_VOLATILITY_START_GUESS;
-        double lowerBound = -Double.MIN_VALUE;
+        double lowerBound = -Double.MAX_VALUE;
         double upperBound = Double.MAX_VALUE;
 
         while (lowerBound == -Double.MAX_VALUE || upperBound == Double.MAX_VALUE) {
