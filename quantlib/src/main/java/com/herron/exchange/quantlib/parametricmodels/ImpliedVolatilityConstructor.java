@@ -15,6 +15,7 @@ import com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholes
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.herron.exchange.common.api.common.enums.OptionTypeEnum.CALL;
 
@@ -30,8 +31,13 @@ public class ImpliedVolatilityConstructor {
         List<ImpliedVolPoint> points = options.stream()
                 .map(option -> {
                     double optionPrice = instrumentToPrice.get(option).getRealValue();
-                    return calculateImpliedVolatility(valuationTime, option, spotPrice, optionPrice, yieldCurve, forwardPriceCurve);
+                    try {
+                        return calculateImpliedVolatility(valuationTime, option, spotPrice, optionPrice, yieldCurve, forwardPriceCurve);
+                    } catch (Exception e) {
+                        return null;
+                    }
                 })
+                .filter(Objects::nonNull)
                 .toList();
         return ImpliedVolatilitySurface.create(underlying.instrumentId(), spotPrice);
     }
