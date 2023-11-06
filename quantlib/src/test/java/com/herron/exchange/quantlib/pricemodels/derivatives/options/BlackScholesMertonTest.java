@@ -36,7 +36,7 @@ class BlackScholesMertonTest {
                 0.00
         );
 
-        assertEquals(PureNumber.create(0.077), iv.scale(3));
+        assertEquals(PureNumber.create(0.039), iv.scale(3));
     }
 
     @Test

@@ -7,15 +7,8 @@ plugins {
 // Project Configs
 allprojects {
 	repositories {
+		mavenCentral()
 		mavenLocal()
-		maven {
-			name = "bytesafe"
-			url = uri("https://herron.bytesafe.dev/maven/herron/")
-			credentials {
-				username = extra["username"] as String?
-				password = extra["password"] as String?
-			}
-		}
 	}
 
 	apply(plugin = "maven-publish")
@@ -42,14 +35,6 @@ allprojects {
 			}
 			repositories {
 				mavenLocal()
-				maven {
-					name = "bytesafe"
-					url = uri("https://herron.bytesafe.dev/maven/herron/")
-					credentials {
-						username = extra["username"] as String?
-						password = extra["password"] as String?
-					}
-				}
 			}
 		}
 	}
@@ -83,6 +68,12 @@ tasks.register<Tar>("buildAndPackage") {
 	archiveExtension.set("tar.gz")
 	destinationDirectory.set(layout.buildDirectory.dir(releaseDirName))
 	from(layout.buildDirectory.file("libs/${rootProject.name}-${version}.jar"))
+}
+
+tasks {
+	named("build") {
+		dependsOn(named("publishToMavenLocal"))
+	}
 }
 
 tasks.withType<Test> {

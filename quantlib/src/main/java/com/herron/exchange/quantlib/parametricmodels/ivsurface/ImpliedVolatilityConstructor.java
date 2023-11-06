@@ -1,4 +1,4 @@
-package com.herron.exchange.quantlib.parametricmodels;
+package com.herron.exchange.quantlib.parametricmodels.ivsurface;
 
 import com.herron.exchange.common.api.common.api.referencedata.instruments.Instrument;
 import com.herron.exchange.common.api.common.api.referencedata.instruments.OptionInstrument;
@@ -28,7 +28,8 @@ public class ImpliedVolatilityConstructor {
                                                      YieldCurve yieldCurve,
                                                      ForwardPriceCurve forwardPriceCurve) {
         double spotPrice = instrumentToPrice.get(underlying).getRealValue();
-        List<ImpliedVolPoint> points = options.stream()
+        List<OptionInstrument> filteredOptions = ImpliedVolatilityFilter.filter(options, instrumentToPrice, spotPrice);
+        List<ImpliedVolPoint> points = filteredOptions.stream()
                 .map(option -> {
                     double optionPrice = instrumentToPrice.get(option).getRealValue();
                     try {
@@ -50,6 +51,7 @@ public class ImpliedVolatilityConstructor {
                                                               ForwardPriceCurve forwardPriceCurve) {
         double strikePrice = option.strikePrice().getRealValue();
         double logMoneyness = option.optionType() == CALL ? Math.log(spotPrice / strikePrice) : Math.log(strikePrice / spotPrice);
+        logMoneyness = Math.log(spotPrice / strikePrice);
         double timeToMaturity = BlackScholesMerton.calculateTimeToMaturity(valuationTime, option);
         double riskFreeRate = yieldCurve.getYield(timeToMaturity);
         double impliedVolatility = switch (option.priceModel()) {
