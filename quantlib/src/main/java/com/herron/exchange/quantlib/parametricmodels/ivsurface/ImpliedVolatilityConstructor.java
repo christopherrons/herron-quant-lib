@@ -51,7 +51,7 @@ public class ImpliedVolatilityConstructor {
                                                               ForwardPriceCurve forwardPriceCurve) {
         double strikePrice = option.strikePrice().getRealValue();
         double logMoneyness = option.optionType() == CALL ? Math.log(spotPrice / strikePrice) : Math.log(strikePrice / spotPrice);
-        logMoneyness = Math.log(spotPrice / strikePrice);
+       // logMoneyness = Math.log(spotPrice / strikePrice);
         double timeToMaturity = BlackScholesMerton.calculateTimeToMaturity(valuationTime, option);
         double riskFreeRate = yieldCurve.getYield(timeToMaturity);
         double impliedVolatility = switch (option.priceModel()) {

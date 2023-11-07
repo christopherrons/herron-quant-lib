@@ -20,29 +20,35 @@ public class ImpliedVolatilityFilter {
         for (var typeToOptionEntry : typeToOption.entrySet()) {
             OptionTypeEnum optionType = typeToOptionEntry.getKey();
             List<OptionInstrument> optionsOfType = typeToOptionEntry.getValue();
-            OptionData[][] grid = buildGrid(optionsOfType, instrumentToPrice);
-            int nrOfMaturities = grid.length;
+            List<List<OptionData>> optionsByMaturity = buildGrid(optionsOfType, instrumentToPrice);
+
+            int nrOfMaturities = optionsByMaturity.size();
             for (var maturity = 0; maturity < nrOfMaturities; maturity++) {
-                int nrOfStrikes = grid[maturity].length;
+                List<OptionData> strikesAtMaturity = optionsByMaturity.get(maturity);
+                int nrOfStrikes = strikesAtMaturity.size();
                 for (var strike = 0; strike < nrOfStrikes; strike++) {
-                    OptionData current = grid[maturity][strike];
+                    OptionData current = strikesAtMaturity.get(strike);
 
                     if (strike + 1 < nrOfStrikes) {
-                        OptionData vertical = grid[maturity][strike + 1];
-                        if (hasVerticalSpreadArbitrage(current, vertical, optionType))
+                        OptionData vertical = strikesAtMaturity.get(strike + 1);
+                        if (hasVerticalSpreadArbitrage(current, vertical, optionType)) {
                             continue;
-                    }
-                    if (maturity + 1 < nrOfMaturities) {
-                        OptionData calendar = grid[maturity + 1][strike];
-                        if (hasCalendarSpreadArbitrage(current, calendar, optionType))
-                            continue;
+                        }
                     }
 
-                    if (maturity + 2 < nrOfMaturities) {
-                        OptionData vertical = grid[maturity][strike + 1];
-                        OptionData butterfly = grid[maturity][strike + 2];
-                        if (hasButterflySpreadArbitrage(current, vertical, butterfly, optionType))
+                    if (maturity + 1 < nrOfMaturities && strike < optionsByMaturity.get(maturity + 1).size()) {
+                        OptionData calendar = optionsByMaturity.get(maturity + 1).get(strike);
+                        if (hasCalendarSpreadArbitrage(current, calendar, optionType)) {
                             continue;
+                        }
+                    }
+
+                    if (strike + 2 < nrOfStrikes) {
+                        OptionData vertical = strikesAtMaturity.get(strike + 1);
+                        OptionData butterfly = strikesAtMaturity.get(strike + 2);
+                        if (hasButterflySpreadArbitrage(current, vertical, butterfly, optionType)) {
+                            continue;
+                        }
                     }
 
                     acceptedOptions.add(current.option);
@@ -74,27 +80,27 @@ public class ImpliedVolatilityFilter {
         };
     }
 
-    private static OptionData[][] buildGrid(List<OptionInstrument> options,
-                                            Map<Instrument, Price> instrumentToPrice) {
+    private static List<List<OptionData>> buildGrid(List<OptionInstrument> options,
+                                                    Map<Instrument, Price> instrumentToPrice) {
         Map<Timestamp, List<OptionInstrument>> maturityToOptions = options.stream().collect(Collectors.groupingBy(OptionInstrument::maturityDate));
         Map<Timestamp, List<OptionInstrument>> sortedMaturityToOptions = new TreeMap<>(maturityToOptions);
 
-        OptionData[][] optionDataGrid = {};
-        int maturity = 0;
+        List<List<OptionData>> optionDataGrid = new ArrayList<>();
         for (var optionsByAscendingMaturity : sortedMaturityToOptions.entrySet()) {
             List<OptionInstrument> optionsByAscendingStrike = optionsByAscendingMaturity.getValue();
             optionsByAscendingStrike.sort(Comparator.comparing(o -> o.strikePrice().getRealValue()));
-            int strike = 0;
+            List<OptionData> strikesAtMaturity = new ArrayList<>();
+            optionDataGrid.add(strikesAtMaturity);
             for (var option : optionsByAscendingStrike) {
-                optionDataGrid[maturity][strike] = new OptionData(
-                        option.maturityDate(),
-                        option.strikePrice().getRealValue(),
-                        instrumentToPrice.get(option).getRealValue(),
-                        option
+                strikesAtMaturity.add(
+                        new OptionData(
+                                option.maturityDate(),
+                                option.strikePrice().getRealValue(),
+                                instrumentToPrice.get(option).getRealValue(),
+                                option
+                        )
                 );
-                strike++;
             }
-            maturity++;
         }
 
         return optionDataGrid;
