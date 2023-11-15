@@ -2,6 +2,8 @@ package com.herron.exchange.quantlib.parametricmodels.ivsurface;
 
 import com.herron.exchange.common.api.common.api.referencedata.instruments.Instrument;
 import com.herron.exchange.common.api.common.api.referencedata.instruments.OptionInstrument;
+import com.herron.exchange.common.api.common.enums.SurfaceConstructionMethod;
+import com.herron.exchange.common.api.common.math.MathUtils;
 import com.herron.exchange.common.api.common.messages.common.Price;
 import com.herron.exchange.common.api.common.messages.common.Timestamp;
 import com.herron.exchange.common.api.common.messages.pricing.Black76PriceModelParameters;
@@ -9,6 +11,7 @@ import com.herron.exchange.common.api.common.messages.pricing.BlackScholesPriceM
 import com.herron.exchange.common.api.common.parametricmodels.forwardcurve.ForwardPriceCurve;
 import com.herron.exchange.common.api.common.parametricmodels.impliedvolsurface.ImpliedVolatilitySurface;
 import com.herron.exchange.common.api.common.parametricmodels.impliedvolsurface.model.ImpliedVolPoint;
+import com.herron.exchange.common.api.common.parametricmodels.impliedvolsurface.model.ImpliedVolatilitySurfaceModelParameters;
 import com.herron.exchange.common.api.common.parametricmodels.yieldcurve.YieldCurve;
 import com.herron.exchange.quantlib.pricemodels.derivatives.options.Black76;
 import com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholesMerton;
@@ -16,8 +19,6 @@ import com.herron.exchange.quantlib.pricemodels.derivatives.options.BlackScholes
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static com.herron.exchange.common.api.common.enums.OptionTypeEnum.CALL;
 
 public class ImpliedVolatilityConstructor {
 
@@ -40,7 +41,11 @@ public class ImpliedVolatilityConstructor {
                 })
                 .filter(Objects::nonNull)
                 .toList();
-        return ImpliedVolatilitySurface.create(underlying.instrumentId(), spotPrice);
+        return ImpliedVolatilitySurface.create(
+                underlying.instrumentId(),
+                spotPrice,
+                new ImpliedVolatilitySurfaceModelParameters(SurfaceConstructionMethod.HERMITE_BICUBIC, points)
+        );
     }
 
     private static ImpliedVolPoint calculateImpliedVolatility(Timestamp valuationTime,
@@ -50,8 +55,7 @@ public class ImpliedVolatilityConstructor {
                                                               YieldCurve yieldCurve,
                                                               ForwardPriceCurve forwardPriceCurve) {
         double strikePrice = option.strikePrice().getRealValue();
-        double logMoneyness = option.optionType() == CALL ? Math.log(spotPrice / strikePrice) : Math.log(strikePrice / spotPrice);
-       // logMoneyness = Math.log(spotPrice / strikePrice);
+        double logMoneyness = Math.log(strikePrice / spotPrice);
         double timeToMaturity = BlackScholesMerton.calculateTimeToMaturity(valuationTime, option);
         double riskFreeRate = yieldCurve.getYield(timeToMaturity);
         double impliedVolatility = switch (option.priceModel()) {
@@ -81,6 +85,10 @@ public class ImpliedVolatilityConstructor {
             default -> 0;
         };
 
-        return new ImpliedVolPoint(timeToMaturity, logMoneyness, impliedVolatility);
+        return new ImpliedVolPoint(
+                MathUtils.roundDouble(timeToMaturity, 5),
+                MathUtils.roundDouble(logMoneyness, 5),
+                MathUtils.roundDouble(impliedVolatility, 5)
+        );
     }
 }
