@@ -8,4 +8,4 @@ This module has pricing models for calculating theoretical pricing for financial
 
 ## Requirements
 
-* Java 17
+* Java 21
